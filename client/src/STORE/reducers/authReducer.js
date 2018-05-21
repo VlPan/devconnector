@@ -1,5 +1,6 @@
-import { TEXT_DISPATCH } from "../actions/type";
-
+import axios from 'axios';
+import { SET_CURRENT_USER } from '../actions/type';
+import isEmpty  from './../../utils/isEmpty';
 
 const initalState = {
     isAuthenticated: false,
@@ -7,12 +8,14 @@ const initalState = {
 }
 
 export default function(state = initalState, action ) {
-    switch(action.type) {
-        case TEXT_DISPATCH:
-        return {
-            ...state,
-            user: action.payload
-        }
+    switch(action.type) {   
+        case SET_CURRENT_USER: {
+            return {
+                ...state,
+                isAuthenticated: !isEmpty(action.payload),
+                user: action.payload
+            }
+        }  
         default: 
             return state
     }

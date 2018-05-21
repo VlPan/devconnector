@@ -8,7 +8,27 @@ import { Footer, Navbar, Landing } from './components/layout';
 import { Register, Login } from './components/register/auth';
 import { Provider } from 'react-redux';
 import { store } from './STORE/store'; 
+import  jwt_decode from 'jwt-decode';
+import setAuthToken from './utils/setAuthToken';
+import { setCurrentUser, logoutUser } from './STORE/actions/authActions';
 
+
+
+
+if(localStorage.jwtToken){
+  setAuthToken(localStorage.jwtToken);
+  // Decode token and get user info and expiration
+  const decoded = jwt_decode(localStorage.jwtToken);
+  // Set user and isAuthenticated
+  store.dispatch(setCurrentUser(decoded)); 
+
+  // Check if expired
+  const currentTime = Date.now() / 1000;
+  if(decoded.exp < currentTime) {
+    store.dispatch(logoutUser); 
+    window.location.href = '/login'
+  }
+}
 
 class App extends Component {
   

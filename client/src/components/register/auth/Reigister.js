@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import axios from 'axios';
+import { withRouter } from 'react-router-dom';
 import {connect} from 'react-redux';
 import { registerUser } from '../../../STORE/actions/authActions';
 import './css.css'
@@ -23,6 +23,18 @@ class RegisterComponent extends Component {
     this.hundleSubmit = this.hundleSubmit.bind(this);
   }
 
+  componentWillReceiveProps(nextProps){
+    if(nextProps.errors) {
+      this.setState({ errors: nextProps.errors })
+    }
+  }
+
+  componentDidMount() {
+    if(this.props.auth.isAuthenticated) {
+     this.props.history.push('/dashboard');
+    }
+ }
+
   handleChange = name => event => {
     this.setState({
       [name]: event.target.value,
@@ -40,17 +52,13 @@ class RegisterComponent extends Component {
       email: this.state.email
     }
 
-    this.props.registerUser(newUser);
-    axios.post('/api/users/register', newUser).then((res) => {
-      console.log(res.data); 
-    })
-    .catch(err => this.setState({errors: err.response.data}));
-
-    console.log(newUser)
+    
+    this.props.registerUser(newUser, this.props.history);
   }
 
   render() {
     return (
+     
       <div>
         <form noValidate autoComplete="off" style={{display:'flex', flexWrap: 'wrap'}} onSubmit={this.hundleSubmit}>
         <TextField
@@ -60,8 +68,9 @@ class RegisterComponent extends Component {
           onChange={this.handleChange('name')}
           margin="normal"
         />
-        {this.state.errors.name && <h3>{this.state.errors.name}</h3>}
-
+        <div>
+          {this.state.errors.name && <h3>{this.state.errors.name}</h3>}
+        </div>
         <TextField
           id="email"
           label="Email"
@@ -69,8 +78,9 @@ class RegisterComponent extends Component {
           onChange={this.handleChange('email')}
           margin="normal"
         />
-        {this.state.errors.email && <h3>{this.state.errors.email}</h3>}
-
+        <div>
+          {this.state.errors.email && <h3>{this.state.errors.email}</h3>}
+        </div>
         <TextField
           id="password"
           label="Password"
@@ -80,17 +90,20 @@ class RegisterComponent extends Component {
           onChange={this.handleChange('password')}
           margin="normal"
         />
-        {this.state.errors.password && <h3>{this.state.errors.password}</h3>}
-
+         <div>
+            {this.state.errors.password && <h3>{this.state.errors.password}</h3>}
+        </div>
         <TextField
           id="password2"
           label="Repear Password"
           value={this.state.password2}
           onChange={this.handleChange('password2')}
           margin="normal"
+          type="password"
         />
-      {this.state.errors.password2 && <h3>{this.state.errors.password2}</h3>}
-
+        <div>
+          {this.state.errors.password2 && <h3>{this.state.errors.password2}</h3>}
+       </div>
         <Button variant="raised" color="primary" style={{maringRight: '20px'}} type="submit">
             Register
         </Button>
@@ -102,18 +115,21 @@ class RegisterComponent extends Component {
   }
 }
 
-RegisterComponent.PropTypes = {
-  registerUser: PropTypes.func.isRequired,
-  auth: PropTypes.object.isRequired
-}
+// RegisterComponent.PropTypes = {
+//   registerUser: propTypes.func.isRequired,
+//   auth: propTypes.object.isRequired,
+//   errors: propTypes.object.isRequired
+// }
 
-const mapStateToProps = (state) => {
-  auth: state.auth;
-};
-
-const mapDispatchToProps = (dispatch) => ({
-  registerUser: () => dispatch(registerUser()),
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+  errors: state.errors
 });
 
-export const Register = connect(null, mapDispatchToProps)(RegisterComponent);
+
+const mapDispatchToProps = (dispatch) => ({
+  registerUser: (userData, history) => dispatch(registerUser(userData, history)),
+});
+
+export const Register = connect(mapStateToProps, mapDispatchToProps)(withRouter(RegisterComponent));
 
