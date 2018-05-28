@@ -11,7 +11,7 @@ import { store } from './STORE/store';
 import  jwt_decode from 'jwt-decode';
 import setAuthToken from './utils/setAuthToken';
 import { setCurrentUser, logoutUser } from './STORE/actions/authActions';
-
+import 'rxjs';
 
 
 

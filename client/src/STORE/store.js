@@ -1,8 +1,16 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
 import rootReducer from './reducers';
+import { combineEpics, createEpicMiddleware } from 'redux-observable';
+import { authEpic } from './middleware/Auth-Epic/authEpic';
+import 'rxjs';
 
-const middleware = [thunk];
+export const rootEpic = combineEpics(
+    authEpic
+);
+const epicMiddleware = createEpicMiddleware(rootEpic);
+
+const middleware = [thunk, epicMiddleware];
 const initialState = {};
 
 
